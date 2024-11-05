@@ -1,0 +1,19 @@
+package db
+
+import "gorm.io/gorm"
+
+type ExampleRepository struct {
+	db *gorm.DB
+}
+
+type ExampleRepositoryInterface interface {
+	ExampleRepository()
+}
+
+func NewExampleRepository(db *gorm.DB) *ExampleRepository {
+	return &ExampleRepository{db: db}
+}
+
+func (r *ExampleRepository) ExampleRepository() {
+	return
+}

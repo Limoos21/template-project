@@ -1,0 +1,19 @@
+package db
+
+import (
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+// Database Добавить другие базы данных по желанию
+type Database struct {
+	DbPostgres *gorm.DB
+}
+
+func NewDatabase(dsn string) (*Database, error) {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		return nil, err
+	}
+	return &Database{DbPostgres: db}, nil
+}

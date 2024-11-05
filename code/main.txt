@@ -1,0 +1,43 @@
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+	"log"
+	"{{ProjectName}}/config"
+	"{{ProjectName}}/internal/application"
+	"{{ProjectName}}/internal/infra"
+	"{{ProjectName}}/internal/infra/db"
+	"{{ProjectName}}/internal/infra/middleware"
+	"{{ProjectName}}/internal/interfaces/http"
+)
+
+func main() {
+	// Загружаем конфигурацию
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("Не удалось загрузить конфигурацию:", err)
+	}
+
+	// Подключаемся к базе данных
+	dsn := "host=" + cfg.DBHost + " user=" + cfg.DBUser + " password=" + cfg.DBPassword + " dbname=" + cfg.DBName + " port=" + cfg.DBPort + " sslmode=disable"
+	dataBase, err := db.NewDatabase(dsn)
+	if err != nil {
+		log.Fatal("Ошибка подключения к базе данных:", err)
+	}
+
+	repository := db.NewExampleRepository(dataBase.DbPostgres)
+
+	usecases := application.NewExampleUseCase(repository)
+
+	server := gin.Default()
+	noCors := middleware.NoCorsMiddelware()
+	server.Use(gin.Recovery())
+	server.Use(noCors)
+	exampleGroup := infra.NewRouterGroup("example/v1/", []gin.HandlerFunc{middleware.NoOpMiddleware()}, server)
+	http.NewExampleHandler(exampleGroup, usecases)
+
+	err = server.Run(":8080")
+	if err != nil {
+		return
+	}
+}

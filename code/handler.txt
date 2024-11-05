@@ -1,0 +1,22 @@
+package http
+
+import (
+	"github.com/gin-gonic/gin"
+	"{{ProjectName}}/internal/application"
+)
+
+type ExampleHandler struct {
+	usecace application.ExampleUseCaseInterface
+}
+
+func NewExampleHandler(r *gin.RouterGroup, usecace application.ExampleUseCaseInterface) {
+	handler := &ExampleHandler{usecace}
+	r.POST("/example", handler.ExampleHandler)
+
+}
+
+func (handler *ExampleHandler) ExampleHandler(c *gin.Context) {
+	handler.usecace.ExampleUseCaseFunc()
+	c.String(200, "Hello world")
+	return
+}
